@@ -1,10 +1,20 @@
 import Link from "next/link";
 async function getData() {
-  const res = await fetch("http://localhost:3000/api/issues", { next: { revalidate: 60 } });
-  return res.json()
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const res = await fetch(`${apiUrl}/api/issues`, { next: { revalidate: 60 } });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch data: ${res.statusText}`);
+  }
+  return res.json();
 }
 export default async function Home() {
-  const data = await getData()
+  let data;
+  try {
+    data = await getData();
+  } catch (error) {
+    console.error(error);
+    data = { name: "Error", author: "Unknown", labels: [], url: "#" };
+  }
   return (
     <>
       <div className="mb-10">
