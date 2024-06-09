@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Head from "next/head";
 async function getData() {
-  const res = await fetch("http://localhost:3000/api/issues", { next: { revalidate: 60 } });
+  const res = await fetch("https://localhost:3000/api/issues", { next: { revalidate: 60 } });
   return res.json()
 }
 export default async function Home() {
