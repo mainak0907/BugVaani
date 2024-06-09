@@ -8,9 +8,6 @@ export default async function Home() {
   const data = await getData()
   return (
     <>
-      <Head>
-        <link rel="stylesheet" href="https://unpkg.com/@themesberg/flowbite@1.2.0/dist/flowbite.min.css" />
-      </Head>
       <div className="mb-10">
 
         <div className="hero min-h-screen bg-base-200">
@@ -53,13 +50,12 @@ export default async function Home() {
               <p className="text-gray-500 dark:text-gray-400 text-sm">{data.labels.join(", ")}</p>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
-              <p className="text-gray-500 dark:text-gray-400 text-sm"><Link href={data.url} className="hover:to-blue-700">{data.url}</Link></p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm"><Link href={data.url} className="hover:text-blue-700">{data.url}</Link></p>
             </div>
           </div>
         </div>
       </div>
       <footer className="flex justify-center align-middle mt-8">Powered by Open Source and Novu</footer>
-      <script src="https://unpkg.com/@themesberg/flowbite@1.2.0/dist/flowbite.bundle.js"></script>
     </>
   );
 }
