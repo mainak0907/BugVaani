@@ -1,58 +1,61 @@
-import { Octokit } from "octokit";
-import fs from "fs";
-import path from "path";
-import { Novu } from "@novu/node";
-import { NextResponse } from "next/server";
+// app/api/getRandomIssue/route.js
+import { MongoClient } from 'mongodb';
+import { Octokit } from 'octokit';
+import { NextResponse } from 'next/server';
+import { Novu } from '@novu/node';
+
 const novu = new Novu(process.env.NOVU_TOKEN);
 
 export async function GET(req) {
-      const send  = req.query;
-      const q = "is:open is:issue label:good-first-issue";
-      const octokit = new Octokit();
+  try {
+    // Connect to MongoDB
+    const client = new MongoClient(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    await client.connect();
+    const db = client.db();
+    const collection = db.collection('subscribers');
 
-      const response = await octokit.request("GET /search/issues", {
-        q,
+    // Retrieve all users from MongoDB
+    const users = await collection.find({}).toArray();
+
+    // Close MongoDB connection
+    await client.close();
+
+    // Retrieve a random issue from GitHub
+    const octokit = new Octokit();
+    const q = 'is:open is:issue label:good-first-issue';
+    const response = await octokit.request('GET /search/issues', { q });
+    const results = response.data.items.map((item) => ({
+      name: item.title,
+      author: item.user.login,
+      labels: item.labels.map((label) => label.name),
+      url: item.html_url,
+    }));
+    const randomIndex = Math.floor(Math.random() * results.length);
+    const issue = results[randomIndex];
+
+    // Send emails to all users
+    for (const user of users) {
+      novu.trigger('digest-workflow-example', {
+        to: {
+          subscriberId: user._id.toString(), // Convert ObjectId to string
+          email: user.email, // Access the email field from the user document
+        },
+        payload: {
+          name: user.name,
+          title: issue.name,
+          author: issue.author,
+          labels: issue.labels.join(', '),
+          url: issue.url,
+        },
       });
+    }
 
-      const results = response.data.items.map((item) => ({
-        name: item.title,
-        author: item.user.login,
-        labels: item.labels.map((label) => label.name),
-        url: item.html_url,
-      }));
-      const random = Math.floor(Math.random() * (results.length + 1));
-      const issue = results[random];
-
-      if (true) {
-        const files = fs.readdirSync(path.resolve("data"));
-        const users = files.map((file) => ({
-          ...JSON.parse(fs.readFileSync(path.resolve("data", file), "utf8")),
-          file,
-        }));
-
-        users.forEach((user) => {
-          console.log(user.email)
-          novu.trigger("digest-workflow-example", {
-            to: {
-              subscriberId:"6575c1d62c7e267bc3978fb1",
-              email: user.email,
-            },
-            payload: {
-              name: user.name,
-              title: issue.name,
-              author: issue.author,
-              labels: issue.labels.join(", "),
-              url: issue.url,
-            }
-          });
-        });
-      }
-    // const issue={
-    //     name: "hello",
-    //     title: "hello",
-    //     author: "hello",
-    //     labels: "good-first-issue",
-    //     url: "..."
-    // }
-    return NextResponse.json(issue, { status: 200 })
+    return NextResponse.json(issue, { status: 200 });
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.error(error);
+  }
 }
