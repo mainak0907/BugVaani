@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 async function getData() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const res = await fetch(`${apiUrl}/api/issues`, { next: { revalidate: 60 } });
+  const res = await fetch(`${apiUrl}/api/issues`, { cache: 'no-store' });
   if (!res.ok) {
     throw new Error(`Failed to fetch data: ${res.statusText}`);
   }
