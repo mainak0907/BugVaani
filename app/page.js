@@ -1,4 +1,6 @@
 // app/page.js
+"use client";
+import { useEffect, useState } from 'react';
 import EmailSubscriptionForm from './components/EmailSubscriptionForm';
 import Link from 'next/link';
 
@@ -11,14 +13,31 @@ async function getData() {
   return res.json();
 }
 
-export default async function Home() {
-  let data;
-  try {
-    data = await getData();
-  } catch (error) {
-    console.error(error);
-    data = { name: 'Error', author: 'Unknown', labels: [], url: '#' };
-  }
+export default function Home() {
+  const [clientData, setClientData] = useState({
+    name: 'Loading...',
+    author: 'Loading...',
+    labels: [],
+    url: '#',
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getData();
+        setClientData(data);
+      } catch (error) {
+        console.error(error);
+        setClientData({
+          name: 'Error',
+          author: 'Unknown',
+          labels: [],
+          url: '#',
+        });
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="mb-10">
@@ -104,7 +123,7 @@ export default async function Home() {
             aria-labelledby="profile-tab"
           >
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {data.name}
+              {clientData.name}
             </p>
           </div>
           <div
@@ -114,7 +133,7 @@ export default async function Home() {
             aria-labelledby="dashboard-tab"
           >
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {data.author}
+              {clientData.author}
             </p>
           </div>
           <div
@@ -124,7 +143,7 @@ export default async function Home() {
             aria-labelledby="settings-tab"
           >
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {data.labels.join(', ')}
+              {clientData.labels.join(', ')}
             </p>
           </div>
           <div
@@ -134,8 +153,8 @@ export default async function Home() {
             aria-labelledby="contacts-tab"
           >
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              <Link href={data.url} className="hover:text-blue-700">
-                {data.url}
+              <Link href={clientData.url} className="hover:text-blue-700">
+                {clientData.url}
               </Link>
             </p>
           </div>
