@@ -5,7 +5,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'A issue a day',
-  description: 'Created by Mainak Chattopadhyay',
+  description: 'GitHub Good First Issue Finder',
 }
 
 export default function RootLayout({ children }) {
