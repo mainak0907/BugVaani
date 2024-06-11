@@ -1,4 +1,6 @@
 // app/api/getRandomIssue/route.js
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import { MongoClient } from 'mongodb';
 import { Octokit } from 'octokit';
 import { NextResponse } from 'next/server';
