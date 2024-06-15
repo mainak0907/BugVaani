@@ -1,5 +1,5 @@
 # A-Issue-A-Day
-Made with Novu, Next JS 14, GitHub API
+Made with Novu, Next JS 14, GitHub API,MongoDB
 
 A Github good-first-issue finder that sends mail notifications about that issue and repo, so that you keep up your Open Source Journey.
 
