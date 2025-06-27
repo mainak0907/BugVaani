@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col justify-between">
       <div className="flex-1">
-        <div className="hero bg-base-200 flex flex-col justify-center items-center text-center py-16">
+        <div className="hero bg-base-200 flex flex-col justify-center items-center text-center py-10">
           <h1 className="text-5xl font-bold mb-4">Github good-first-issues!</h1>
           <p className="text-lg text-gray-600">From Mainak🖤</p>
           <p className="text-lg text-gray-600">SCROLL DOWN TO EXPLORE</p>
@@ -158,7 +158,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <footer className="text-center text-gray-600 dark:text-gray-400 mt-8">
+      <footer className="border-t border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-400 mt-8 py-8">
         Powered by Open Source and Novu
       </footer>
     </div>
