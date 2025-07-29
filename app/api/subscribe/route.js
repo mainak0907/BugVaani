@@ -19,6 +19,13 @@ export async function POST(req) {
     const db = client.db();
     const collection = db.collection('subscribers');
 
+    //Check if a user with the given email already exists in the database
+    const existingUser = await collection.findOne({ email });
+    if (existingUser) {
+      client.close(); // It is important to close the MongoDB client connection to prevent resource leaks
+      return NextResponse.json({ message: 'User already exists' }, { status: 400 });
+    }
+
     await collection.insertOne({ name, email });
 
     client.close();
