@@ -1,34 +1,31 @@
 // app/api/subscribe/route.js
+
 import { MongoClient } from 'mongodb';
 import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   const { name, email } = await req.json();
 
-  if (!name || !email || !email.includes('@')) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!name || !email || !emailRegex.test(email)) {
     return NextResponse.json({ message: 'Invalid name or email address.' }, { status: 422 });
   }
 
-  const client = new MongoClient(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  const client = new MongoClient(process.env.MONGODB_URI);
 
   try {
     await client.connect();
     const db = client.db();
     const collection = db.collection('subscribers');
 
-    //Check if a user with the given email already exists in the database
     const existingUser = await collection.findOne({ email });
     if (existingUser) {
-      client.close(); // It is important to close the MongoDB client connection to prevent resource leaks
+      await client.close();
       return NextResponse.json({ message: 'User already exists' }, { status: 400 });
     }
 
     await collection.insertOne({ name, email });
-
-    client.close();
+    await client.close();
 
     return NextResponse.json({ message: 'Name and email stored successfully!' }, { status: 201 });
   } catch (error) {
