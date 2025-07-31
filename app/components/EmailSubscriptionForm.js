@@ -1,12 +1,28 @@
+
 import { useState } from 'react';
 
 export default function EmailSubscriptionForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  // Email validation regex
+  const validateEmail = (email) => {
+    // Simple regex for demonstration; can be improved for stricter validation
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const subscribeHandler = async (event) => {
     event.preventDefault();
+
+    // Validate email before submitting
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    } else {
+      setEmailError('');
+    }
 
     try {
       const res = await fetch('/api/subscribe', {
@@ -57,10 +73,19 @@ export default function EmailSubscriptionForm() {
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError && validateEmail(e.target.value)) {
+                setEmailError('');
+              }
+            }}
             placeholder="Enter your email"
             required
+            aria-describedby="email-error"
           />
+          {emailError && (
+            <p id="email-error" className="text-red-500 text-xs mt-2">{emailError}</p>
+          )}
         </div>
         <div className="flex justify-center">
           <button
