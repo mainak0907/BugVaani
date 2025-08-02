@@ -10,7 +10,6 @@ export default function EmailSubscriptionForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
 
-  // Email validation regex
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
@@ -21,7 +20,6 @@ export default function EmailSubscriptionForm() {
     setMessage('');
     setMessageType('');
 
-    // Validate email before submitting
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address.');
       setIsLoading(false);
