@@ -8,12 +8,27 @@ export default function EmailSubscriptionForm() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+
+  // Email validation regex
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const subscribeHandler = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setMessage('');
     setMessageType('');
+
+    // Validate email before submitting
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address.');
+      setIsLoading(false);
+      return;
+    } else {
+      setEmailError('');
+    }
 
     try {
       const res = await fetch('/api/subscribe', {
@@ -75,11 +90,22 @@ export default function EmailSubscriptionForm() {
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError && validateEmail(e.target.value)) {
+                  setEmailError('');
+                }
+              }}
               placeholder="you@example.com"
               required
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              aria-describedby="email-error"
             />
+            {emailError && (
+              <p id="email-error" className="text-red-500 text-xs mt-2">
+                {emailError}
+              </p>
+            )}
           </div>
 
           <button
