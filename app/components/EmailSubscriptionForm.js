@@ -1,3 +1,4 @@
+'use client';
 
 import { useState } from 'react';
 
@@ -5,20 +6,23 @@ export default function EmailSubscriptionForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
 
-  // Email validation regex
   const validateEmail = (email) => {
-    // Simple regex for demonstration; can be improved for stricter validation
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const subscribeHandler = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
+    setMessage('');
+    setMessageType('');
 
-    // Validate email before submitting
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address.');
+      setIsLoading(false);
       return;
     } else {
       setEmailError('');
@@ -27,76 +31,104 @@ export default function EmailSubscriptionForm() {
     try {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setMessage(data.message);
+        setMessageType('success');
         setName('');
         setEmail('');
       } else {
-        setMessage(data.message);
+        setMessage(data.message || 'Something went wrong.');
+        setMessageType('error');
       }
     } catch (error) {
       setMessage('An error occurred. Please try again.');
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 transition-all duration-300 hover:shadow-[0_0_50px_4px_rgba(255,255,255,0.8)]">
-      <form onSubmit={subscribeHandler} className="bg-white shadow-md rounded px-8 py-6">
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Name
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email Address
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (emailError && validateEmail(e.target.value)) {
-                setEmailError('');
-              }
-            }}
-            placeholder="Enter your email"
-            required
-            aria-describedby="email-error"
-          />
-          {emailError && (
-            <p id="email-error" className="text-red-500 text-xs mt-2">{emailError}</p>
-          )}
-        </div>
-        <div className="flex justify-center">
+    <div className="flex items-center justify-center px-4 sm:px-0 mt-10">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 dark:text-white backdrop-blur-md rounded-xl shadow-xl p-8 transition hover:shadow-[0_0_40px_rgba(0,0,0,0.1)]">
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
+          💌 Subscribe for Issue Updates
+        </h2>
+
+        <form onSubmit={subscribeHandler} className="space-y-5">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              required
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError && validateEmail(e.target.value)) {
+                  setEmailError('');
+                }
+              }}
+              placeholder="you@example.com"
+              required
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              aria-describedby="email-error"
+            />
+            {emailError && (
+              <p id="email-error" className="text-red-500 text-xs mt-2">
+                {emailError}
+              </p>
+            )}
+          </div>
+
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
+            disabled={isLoading}
+            className={`w-full py-2 px-4 rounded-md text-white font-semibold transition-all duration-200 ${
+              isLoading
+                ? 'bg-blue-300 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600'
+            }`}
           >
-            Subscribe
+            {isLoading ? 'Subscribing...' : 'Subscribe'}
           </button>
-        </div>
-      </form>
-      {message && <p className="text-center text-gray-600 mt-4">{message}</p>}
+        </form>
+
+        {message && (
+          <div
+            className={`mt-4 text-center text-sm font-medium ${
+              messageType === 'success' ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
