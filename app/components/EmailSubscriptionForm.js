@@ -67,7 +67,7 @@ export default function EmailSubscriptionForm() {
 
   return (
     <div className="flex items-center justify-center px-2 xs:px-4 sm:px-0 mt-6 sm:mt-10">
-      <div className="w-full xs:w-[90%] sm:w-[80%] md:w-3/4 lg:w-2/3 xl:w-1/2 bg-white dark:bg-gray-900 dark:text-white backdrop-blur-md rounded-2xl border-2 border-[#ff4a4a] shadow-2xl p-4 sm:p-8 transition hover:shadow-[0_0_40px_rgba(0,0,0,0.1)]">
+      <div className="w-full xs:w-[90%] sm:w-[80%] md:w-3/4 lg:w-2/3 xl:w-1/2 bg-white dark:bg-gray-900 dark:text-white backdrop-blur-md rounded-2xl border-2 border-[#ff4a4a] shadow-2xl p-4 sm:p-8 transition hover:shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_0_40px_rgba(255,74,74,0.2)]">
         <h2 className="flex items-center gap-3 text-lg sm:text-2xl font-bold text-center text-[#1f2937] dark:text-white mb-4 sm:mb-6">
           <BellRing className="text-[#ff4a4a]" /> Subscribe for Issue Updates
         </h2>
@@ -131,7 +131,7 @@ export default function EmailSubscriptionForm() {
         {message && (
           <div
             className={`mt-4 text-center text-xs sm:text-sm font-medium ${
-              messageType === "success" ? "text-green-600" : "text-red-600"
+              messageType === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
             }`}
           >
             {message}
